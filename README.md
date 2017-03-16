@@ -1,7 +1,7 @@
 # brewery-pi
 Raspberry pi controlled brewery fridge
 
-<b>Config file
+<b>Config file</b>
 
 GPIO PINS, 
 Google API and token, 
