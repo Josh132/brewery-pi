@@ -44,7 +44,7 @@ def read_temp():
 
 
 temp = read_temp()
-desiredtemp = IntVar(17)
+desiredtemp = 17
 deg = u'\xb0'#utf code for degree
 
 
@@ -87,8 +87,8 @@ button2.pack(side=LEFT)
 #Set labels
 label1 = Label(topFrame, text="Desired Temp = ", fg="black")
 label2 = Label(middleFrame, text="Actual Temp = ", fg="black")
-label3 = Label(topFrame, textvar=desiredtemp, fg="black")
-label4 = Label(middleFrame, textvar=temp, fg="black")
+label3 = Label(topFrame, text=desiredtemp, fg="black")
+label4 = Label(middleFrame, text=temp, fg="black")
 
 
 #use to put labels on screen
