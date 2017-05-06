@@ -15,6 +15,7 @@ from matplotlib import style
 from datetime import datetime
 from tkinter import *
 
+#set graph style
 style.use("ggplot")
 
 #Set gpio's
@@ -29,7 +30,6 @@ GPIO.output(17,GPIO.LOW)
 GPIO.output(22,GPIO.LOW)
 GPIO.output(27,GPIO.LOW)
 
-
 #grab temp probe information
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -40,9 +40,10 @@ device_file = device_folder + '/w1_slave'
 
 
 # Read temperature from device
-
-
-            
+temp = read_temp()
+desiredtemp = 5
+deg = u'\xb0'#utf code for degree
+relay = "N/A"
 
 def read_temp_raw():
     f = open(device_file, 'r')
@@ -62,19 +63,6 @@ def read_temp():
         #temp_f = temp_c * 9.0 / 5.0 + 32.0
         return temp_c#, temp_f
 
-temp = read_temp()
-desiredtemp = 5
-deg = u'\xb0'#utf code for degree
-relay = "N/A"
-
-'''old list>
-x = list(range(0,49))
-y = [0]*48
-'''
-
-
-
-   
 def increase():  #increase button press
     global desiredtemp
     desiredtemp += 0.5
@@ -89,9 +77,7 @@ def decrease():  #Decrease button press
 root = Tk()
 root.wm_title("Beer Temp") #Name the title bar
 
-#code to add widgets will go here....
-
-#make 3 frames for text and buttons
+#make 5 frames for text and buttons and graph
 topFrame = Frame(root)
 topFrame.pack(side=TOP)
 
@@ -120,7 +106,6 @@ label4 = Label(midlowFrame, text="Relay = ", fg="purple")
 label5 = Label(midlowFrame, textvariable=relaystatus, fg="purple")
 label6 = Label(middleFrame, textvariable=crtmpstr, fg="black")
 
-
 #use to put labels on screen
 label1.pack(side=LEFT)
 label2.pack(side=LEFT)
@@ -138,32 +123,24 @@ button1.pack(side=LEFT)
 button2.pack(side=LEFT)
 
 #Graph at bottom of window
-
 f = Figure(figsize=(5,3), dpi =100)
 a = f.add_subplot(111)
 xList = list(range(0,61))
 yList = [0]*61
 a.plot(xList, yList)
+
+canvas = FigureCanvasTkAgg(f, bottombottomFrame)
+canvas.show()
+canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
+
 #animating the graph (https://www.youtube.com/watch?v=JQ7QP5rPvjU)
 def animate(i):
     a.clear()
     a.plot(xList,yList)
 
-   
-canvas = FigureCanvasTkAgg(f, bottombottomFrame)
-canvas.show()
-canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
-
-
-
 # Continuous print loop
-
-ani = animation.FuncAnimation(f, animate, interval=1000)
 while True:
-
-
     counter = 0
-
     while (counter<=10):
         #print(read_temp())
         if(read_temp()>=desiredtemp):
@@ -180,23 +157,14 @@ while True:
             crtmpstr.set("%s" % read_temp())
             relay="OFF"
             relaystatus.set("%s" % relay)
-
         time.sleep(0.5)
         counter += 1
         root.update()
         print(counter)
-
-
-
     yList.pop(0)
     yList.append(read_temp())
     print(yList)
     print(xList)
 
-
-    '''now = datetime.now()
-    file.write(str(now.day)+"-"+str(now.month)+"-"+str(now.year)+","+str(now.hour)+":"+str(now.minute)+":"+str(now.second)+","+str(read_temp())+"\n")
-    file.flush()'''
-
-
+ani = animation.FuncAnimation(f, animate, interval=1000)            
 root.mainloop()
