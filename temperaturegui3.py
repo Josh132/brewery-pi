@@ -40,10 +40,6 @@ device_file = device_folder + '/w1_slave'
 
 
 # Read temperature from device
-temp = read_temp()
-desiredtemp = 5
-deg = u'\xb0'#utf code for degree
-relay = "N/A"
 
 def read_temp_raw():
     f = open(device_file, 'r')
@@ -72,6 +68,11 @@ def decrease():  #Decrease button press
     global desiredtemp
     desiredtemp -= 0.5
     tmpstr.set("%s" % desiredtemp)
+
+temp = read_temp()
+desiredtemp = 5
+deg = u'\xb0'#utf code for degree
+relay = "N/A"
 
 #Tkinter start
 root = Tk()
@@ -137,6 +138,7 @@ canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
 def animate(i):
     a.clear()
     a.plot(xList,yList)
+ani = animation.FuncAnimation(f, animate, interval=1000)            
 
 # Continuous print loop
 while True:
@@ -166,5 +168,4 @@ while True:
     print(yList)
     print(xList)
 
-ani = animation.FuncAnimation(f, animate, interval=1000)            
 root.mainloop()
