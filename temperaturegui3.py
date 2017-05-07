@@ -15,6 +15,13 @@ from matplotlib import style
 from datetime import datetime
 from tkinter import *
 
+#initialise datetime counter
+d0 = datetime(2017,1,1,0,0,0)
+d1 = datetime.now()
+d2 = int((d1-d0).seconds)
+d2 = int(d2/60)
+d3 = d2 + 1
+
 #set graph style
 style.use("ggplot")
 
@@ -129,7 +136,6 @@ a = f1.add_subplot(111)
 xList = list(range(0,61))
 yList = [0]*61
 a.plot(xList, yList)
-
 canvas = FigureCanvasTkAgg(f1, bottombottomFrame)
 canvas.show()
 canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
@@ -142,9 +148,7 @@ ani = animation.FuncAnimation(f1, animate, interval=1000)
 
 # Continuous print loop
 while True:
-    counter = 0
-    while (counter<=10):
-        #print(read_temp())
+    while (d3>d2):
         if(read_temp()>=desiredtemp):
             GPIO.output(17,GPIO.HIGH)
             GPIO.output(5,GPIO.HIGH)
@@ -160,8 +164,16 @@ while True:
             relay="OFF"
             relaystatus.set("%s" % relay)
         time.sleep(0.5)
-        counter += 1
+        d1 = datetime.now()
+        d2 = int((d1-d0).seconds)
+        d2 = int(d2/60)
+        d4 = int((d1-d0).seconds)
         root.update()
+    d3 = d2 + 1
+    '''update counter to increase by one minute, this should not lose
+    time as it reads the whole minute then adds one. even if the counter
+    loses seconds every cycle it will still be close to the start of the
+    minute/within the minute.'''
     yList.pop(0)
     yList.append(read_temp())
 
