@@ -124,13 +124,13 @@ button1.pack(side=LEFT)
 button2.pack(side=LEFT)
 
 #Graph at bottom of window
-f = Figure(figsize=(5,3), dpi =100)
-a = f.add_subplot(111)
+f1 = Figure(figsize=(5,3), dpi =100)
+a = f1.add_subplot(111)
 xList = list(range(0,61))
 yList = [0]*61
 a.plot(xList, yList)
 
-canvas = FigureCanvasTkAgg(f, bottombottomFrame)
+canvas = FigureCanvasTkAgg(f1, bottombottomFrame)
 canvas.show()
 canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
 
@@ -138,7 +138,7 @@ canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
 def animate(i):
     a.clear()
     a.plot(xList,yList)
-ani = animation.FuncAnimation(f, animate, interval=1000)            
+ani = animation.FuncAnimation(f1, animate, interval=1000)
 
 # Continuous print loop
 while True:
@@ -162,10 +162,7 @@ while True:
         time.sleep(0.5)
         counter += 1
         root.update()
-        print(counter)
     yList.pop(0)
     yList.append(read_temp())
-    print(yList)
-    print(xList)
 
 root.mainloop()
