@@ -16,11 +16,23 @@ from datetime import datetime
 from tkinter import *
 
 #initialise datetime counter
-d0 = datetime(2017,1,1,0,0,0)
-d1 = datetime.now()
-d2 = int((d1-d0).seconds)
-d2 = int(d2/60)
-d3 = d2 + 1
+
+def clock():
+    d0 = datetime(2017,1,1,0,0,0)
+    d1 = datetime.now()
+    d2 = int((d1-d0).seconds)
+    d2 = int(d2)
+    return d2
+def updateclock(log_time):
+    d3 = clock() + log_time
+    '''update counter to increase by one minute, this should not lose
+    time as it reads the whole minute then adds one. even if the counter
+    loses seconds every cycle it will still be close to the start of the
+    minute/within the minute.'''
+    return d3
+d2 = clock()
+d3 = updateclock(20)
+
 
 #set graph style
 style.use("ggplot")
@@ -76,8 +88,24 @@ def decrease():  #Decrease button press
     desiredtemp -= 0.5
     tmpstr.set("%s" % desiredtemp)
 
+def tempcontrol():
+    if(read_temp()>=desiredtemp):
+        GPIO.output(17,GPIO.HIGH)
+        GPIO.output(5,GPIO.HIGH)
+        GPIO.output(22,GPIO.LOW)
+        crtmpstr.set("%s" % read_temp())
+        relay="ON"
+        relaystatus.set("%s" % relay)
+    else:
+        GPIO.output(17,GPIO.LOW)
+        GPIO.output(5,GPIO.LOW)
+        GPIO.output(22,GPIO.HIGH)
+        crtmpstr.set("%s" % read_temp())
+        relay="OFF"
+        relaystatus.set("%s" % relay)
+
 temp = read_temp()
-desiredtemp = 5
+desiredtemp = int(input('Input desired temperature: '))
 deg = u'\xb0'#utf code for degree
 relay = "N/A"
 
@@ -130,51 +158,37 @@ button2 = Button(bottomFrame, text="Decrease (0.5"+ deg +"C)", fg="red", command
 button1.pack(side=LEFT)
 button2.pack(side=LEFT)
 
+
+xList = list(range(0,61))
+yList = [0]*61
+
+'''
 #Graph at bottom of window
 f1 = Figure(figsize=(5,3), dpi =100)
 a = f1.add_subplot(111)
-xList = list(range(0,61))
-yList = [0]*61
 a.plot(xList, yList)
 canvas = FigureCanvasTkAgg(f1, bottombottomFrame)
 canvas.show()
 canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
+
 
 #animating the graph (https://www.youtube.com/watch?v=JQ7QP5rPvjU)
 def animate(i):
     a.clear()
     a.plot(xList,yList)
 ani = animation.FuncAnimation(f1, animate, interval=1000)
-
+'''
 # Continuous print loop
 while True:
-    while (d3>d2):
-        if(read_temp()>=desiredtemp):
-            GPIO.output(17,GPIO.HIGH)
-            GPIO.output(5,GPIO.HIGH)
-            GPIO.output(22,GPIO.LOW)
-            crtmpstr.set("%s" % read_temp())
-            relay="ON"
-            relaystatus.set("%s" % relay)
-        else:
-            GPIO.output(17,GPIO.LOW)
-            GPIO.output(5,GPIO.LOW)
-            GPIO.output(22,GPIO.HIGH)
-            crtmpstr.set("%s" % read_temp())
-            relay="OFF"
-            relaystatus.set("%s" % relay)
-        time.sleep(0.5)
-        d1 = datetime.now()
-        d2 = int((d1-d0).seconds)
-        d2 = int(d2/60)
-        d4 = int((d1-d0).seconds)
-        root.update()
-    d3 = d2 + 1
-    '''update counter to increase by one minute, this should not lose
-    time as it reads the whole minute then adds one. even if the counter
-    loses seconds every cycle it will still be close to the start of the
-    minute/within the minute.'''
-    yList.pop(0)
-    yList.append(read_temp())
+    tempcontrol()
+    time.sleep(0.5)
+    d2 = clock()
+    root.update()
+    if (d3<d2):
+        d3 = updateclock(20)
+        yList.pop(0)
+        yList.append(read_temp())
+        print(xList)
+        print(yList)
 
 root.mainloop()
